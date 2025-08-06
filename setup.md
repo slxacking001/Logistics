@@ -28,7 +28,7 @@ Activate enviroment
 ### For windows
 
 ```
-env\Scripts\activate
+.venv\Scripts\activate
 ```
 
 ### macOS/Linux:
@@ -175,10 +175,135 @@ target_metadata = Base.metadata
 ## Set up Postgres Database on your pc
 
 
+### 1. **Download PostgreSQL**
+
+* Go to the official PostgreSQL download page:
+  [https://www.postgresql.org/download/windows/](https://www.postgresql.org/download/windows/)
+
+* Click **"Download the installer"** → you'll be redirected to EDB's website.
+
+* Click the latest version (e.g., **PostgreSQL 16.x**) → Download the **Windows x86-64** version.
+
+---
+
+### Run the Installer
+
+After downloading:
+
+1. **Double-click** the installer file (`postgresql-16.x-windows-x64.exe`)
+2. Follow the prompts:
+
+   * **Installation Directory** → Keep default
+   * **Components** → Make sure these are selected:
+
+     * ✅ PostgreSQL Server
+     * ✅ pgAdmin 4
+     * ✅ Command Line Tools
+
+---
+
+### 3. **Set a Superuser Password**
+
+You’ll be asked to set a password for the default PostgreSQL **superuser (`postgres`)**.
+
+> ⚠️ **IMPORTANT**: Save this password somewhere — you’ll need it to access your database.
+
+---
+
+### 4. **Set Port Number**
+
+* Use the default: `5432`
+* Leave locale as default
+* Click **Next** until installation starts.
+
+---
+
+### 5. **Wait for Installation to Complete**
+
+Click **"Finish"** when it’s done.
+
+You now have:
+
+* PostgreSQL server
+* pgAdmin GUI
+* psql command line tool
+
+---
+
+## Step-by-Step: Set Up pgAdmin
+
+---
+
+### 6. **Open pgAdmin**
+
+* Go to:
+  **Start Menu → PostgreSQL → pgAdmin 4**
+
+* It will launch in your browser (or system tray > right-click pgAdmin icon > "New pgAdmin Window")
+
+---
+
+### 7. **Create a Master Password**
+
+This is **not** your PostgreSQL password. It’s for **pgAdmin only**, to unlock saved connections more like app password.
+
+> Example: `admin123` (You can set anything, just remember it)
+
+---
+
+### 8. **Connect to the Local Server**
+
+1. In pgAdmin left sidebar: Right-click on **“Servers” → Create → Server**
+2. Fill in details:
+
+#### 🔹 General Tab:
+
+* **Name:** Local PostgreSQL (or any name)
+
+#### 🔹 Connection Tab:
+
+* **Host name/address:** `localhost`
+* **Port:** `5432`
+* **Username:** `postgres`
+* **Password:** the one you set during installation
+
+3. Click **Save**
+
+You’ll now be connected to your PostgreSQL server 🎉
+
+---
+
+## Step-by-Step: Create a New Database
+
+---
+
+### 9. **Create a New Database**
+
+1. Expand **Servers > Databases**
+2. Right-click **Databases → Create → Database**
+3. Fill in:
+
+   * **Database name:** `mydb` (or any name, no spaces in between)
+   * Leave owner as `postgres`
+4. Click **Save**
+
+🎉 You’ve now created your own database — ready for your FastAPI app.
+
+---
+
 
 ## Create and Apply Migration
 
-Create initial migration:
+Go back to yur alembic env.py find this line
+
+`sqlalchemy.url = postgresql://username:password@localhost:5432/your_db_name`
+
+replace:
+* username with the one you created earlier `postgres`
+* password with the one you created (not the one for pgadmin)
+* your_db_name with the database name you created `mydb`
+
+## Create initial migration:
 
 ```
 alembic revision --autogenerate -m "create users table"
@@ -193,3 +318,5 @@ alembic upgrade head
 ```
 
 Your users table should now be created in the DB 🎉
+
+if any of the migration fails, revisit your database connection authentication details
